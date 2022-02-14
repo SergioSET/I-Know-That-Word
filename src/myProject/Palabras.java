@@ -8,7 +8,7 @@ public class Palabras {
 
     public Palabras(){
         FileManager fileManager = new FileManager();
-        diccionario = fileManager.lecturaFile();
+        diccionario = fileManager.lecturaFile("Palabras.txt");
     }
 
     public ArrayList<String> getPalabras(){

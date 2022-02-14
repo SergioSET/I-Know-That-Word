@@ -6,18 +6,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.FileWriter;
+import java.io.IOException;
 
-public class GUIGridBagLayout extends JFrame {
+public class GUIGridBagLayout<string> extends JFrame {
 
     private Header headerProject;
-    private JLabel palabraPrueba;
-    private JPanel inicio, mostrarNiveles, panelMostrarPalabras, seleccionarPalabras;
-    private JButton mostrarPalabras, jugar, ayuda, salir, botonSi, botonNo;
+    private JLabel palabraAMostrar, usuario, mostrarNombre, mostrarNivelActual, mostrarAciertos;
+    private JPanel inicio, nombreJugador, panelMostrarPalabras, estadoActual, seleccionarPalabras;
+    private JTextField nombre;
+    private JButton mostrarPalabras, jugar, ayuda, salir, botonSi, botonNo, aceptar, continuar;
     private Timer timer;
+    private Jugador elJugador;
+    private ModelIKnowThatWord elModelo;
     private Escucha escucha;
     private Palabras palabras;
-    private ArrayList<String> diccionario;
-    private boolean flagTimer;
+    private ArrayList<String> palabrasNivel, palabrasMemorizar;
+    private boolean flagTimer, usuarioRegistrado;
+    private ImageIcon imageInicio;
+    private String nombreUsuario = null;
+    private int nivelMaximoSuperado = 1;
+    private int nivelActual = 1;
 
     /**
      * Constructor of GUI class
@@ -32,6 +41,8 @@ public class GUIGridBagLayout extends JFrame {
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
     }
 
     /**
@@ -46,80 +57,129 @@ public class GUIGridBagLayout extends JFrame {
         //Create Listener Object and Control Object
         palabras = new Palabras();
         escucha = new Escucha();
+        elJugador = new Jugador();
+        elModelo = new ModelIKnowThatWord();
         //Set up JComponents
 
         headerProject = new Header("I KNOW THAT WORD!!", Color.BLACK);
-        constraints.gridx = 3;
+        constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.gridwidth = 4;
+        constraints.gridwidth = 3;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.NORTH;
+        //constraints.anchor = GridBagConstraints.NORTHWEST;
         this.add(headerProject, constraints);
 
         ayuda = new JButton("?");
         ayuda.addActionListener(escucha);
-        constraints.gridx = 4;
+        constraints.gridx = 3;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.LINE_START;
+        //constraints.fill = GridBagConstraints.HORIZONTAL;
+        //constraints.anchor = GridBagConstraints.NORTHEAST ;
         this.add(ayuda, constraints);
 
         salir = new JButton("Salir");
         salir.addActionListener(escucha);
-        constraints.gridx = 5;
+        constraints.gridx = 4;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.LINE_START;
+        //constraints.fill = GridBagConstraints.HORIZONTAL;
+        //constraints.anchor = GridBagConstraints.NORTHEAST ;
         this.add(salir, constraints);
 
-        /**
-        palabraPrueba = new JLabel();
-        palabraPrueba.setText("No tengo palabras");
+        //PANTALLA INICIO
+        {
+            inicio = new JPanel();
+            inicio.setPreferredSize(new Dimension(500, 360));
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.gridwidth = 5;
+            constraints.anchor = GridBagConstraints.LINE_START;
+            imageInicio = new ImageIcon(this.getClass().getResource("/myProject/archivos/imagenInicio.png"));
+            JLabel picLabel = new JLabel(imageInicio);
+            inicio.add(picLabel);
 
-        inicio = new JPanel();
-        inicio.setPreferredSize(new Dimension(460, 500));
-         */
+            jugar = new JButton("Jugar");
+            jugar.addActionListener(escucha);
+            inicio.add(jugar);
 
-        jugar = new JButton("Jugar");
-        jugar.addActionListener(escucha);
+            this.add(inicio, constraints);
+        }
 
-        constraints.gridx = 4;
-        constraints.gridy = 4;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.LINE_START;
+        //PANTALLA NOMBRE USUARIO
+        {
+            nombreJugador = new JPanel();
+            nombreJugador.setPreferredSize(new Dimension(500, 360));
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.gridwidth = 5;
 
-        this.add(jugar, constraints);
+            usuario = new JLabel("Ingresa tu nombre");
 
-        inicio = new JPanel();
+            nombre = new JTextField(20);
 
-        constraints.gridx = 3;
-        constraints.gridy = 3;
-        constraints.gridwidth = 2;
-        constraints.fill = GridBagConstraints.BOTH;
+            aceptar = new JButton("Aceptar");
+            aceptar.addActionListener(escucha);
 
-        this.add(inicio, constraints);
+            nombreJugador.add(usuario);
+            nombreJugador.add(nombre);
+            nombreJugador.add(aceptar);
+
+            this.add(nombreJugador, constraints);
+        }
 
 
+        //PANTALLA MOSTRAR ESTADO
+        {
+            estadoActual = new JPanel();
+            estadoActual.setPreferredSize(new Dimension(500, 300));
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.gridwidth = 5;
 
-        mostrarPalabras = new JButton("Mostrar palabras");
+            mostrarNombre = new JLabel("Usuario: " + nombreUsuario);
+            mostrarNivelActual = new JLabel("Nivel actual: " + nivelActual);
+            mostrarAciertos = new JLabel("Aciertos: " + elModelo.aciertos);
 
-        //mostrarPalabras.addActionListener(escucha);
-        //mostrarPalabras.setVisible(false);
-        mostrarPalabras.setEnabled(true);
+            estadoActual.add(mostrarNombre);
+            estadoActual.add(mostrarNivelActual);
+            estadoActual.add(mostrarAciertos);
 
-        constraints.gridx = 4;
-        constraints.gridy = 4;
-        constraints.gridwidth = 2;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.NORTH;
+            this.add(estadoActual, constraints);
+        }
 
-//        this.add(mostrarPalabras, constraints);
+        //PANTALLA MOSTRAR PALABRAS
+        {
+            panelMostrarPalabras = new JPanel();
+            panelMostrarPalabras.setPreferredSize(new Dimension(500, 360));
+            constraints.gridx = 0;
+            constraints.gridy = 2;
+            constraints.gridwidth = 5;
+
+            palabraAMostrar = new JLabel("Aquí se mostrarán las palabras");
+
+            continuar = new JButton("Continuar");
+            continuar.addActionListener(escucha);
+            continuar.setEnabled(false);
+
+            mostrarPalabras = new JButton("Iniciar");
+            mostrarPalabras.addActionListener(escucha);
+
+            panelMostrarPalabras.add(palabraAMostrar);
+            panelMostrarPalabras.add(mostrarPalabras);
+            panelMostrarPalabras.add(continuar);
+
+
+            this.add(panelMostrarPalabras, constraints);
+        }
+
+        inicio.setVisible(true);
+        nombreJugador.setVisible(false);
+        estadoActual.setVisible(false);
+        panelMostrarPalabras.setVisible(false);
+
 
         timer = new Timer(1000, escucha);
-        //timer.stop();
         flagTimer = false;
 
     }
@@ -151,51 +211,83 @@ public class GUIGridBagLayout extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            if(e.getSource()==salir){
+            if (e.getSource() == ayuda) {
+                JOptionPane.showMessageDialog(null, "Este juego consiste en recordar las palabras mostradas y determinar si están en la siguiente aparición");
+            }
+
+            if (e.getSource() == salir) {
+//                if (usuarioRegistrado) {
+//                    elJugador.actualizarNivel(nombreUsuario, nivelMaximoSuperado);
+//                } else {
+//                    elJugador.registrarJugador(nombreUsuario, nivelMaximoSuperado);
+//                }
                 System.exit(0);
             }
 
-            diccionario = palabras.getPalabras();
+            if (e.getSource() == jugar) {
+                inicio.setVisible(false);
+                nombreJugador.setVisible(true);
+            }
+
+            if (e.getSource() == aceptar) {
+
+                nombreUsuario = nombre.getText();
+
+                if (nombreUsuario != "" || nombreUsuario != null) {
+                    JOptionPane.showMessageDialog(null, "Su nombre de usuario es: " + nombreUsuario);
+
+                    if (elJugador.estaRegistrado(nombreUsuario)) {
+                        nivelMaximoSuperado = elJugador.getNivel();
+                        JOptionPane.showMessageDialog(null, "Usted ya se encuentra registrado, su nivel máximo superado es: " + nivelMaximoSuperado);
+                    }else{
+                        nivelMaximoSuperado = 0;
+                    }
+
+                    mostrarNombre.setText("Usuario: " + nombreUsuario);
+                    mostrarNivelActual.setText("Nivel actual: " + nivelActual);
+                    mostrarAciertos.setText("Aciertos: " + elModelo.aciertos);
+
+                    nombreJugador.setVisible(false);
+                    estadoActual.setVisible(true);
+                    panelMostrarPalabras.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "El nombre está vacío");
+                }
+            }
+
+            if(e.getSource() == mostrarPalabras){
+                mostrarPalabras.setEnabled(false);
+                palabrasMemorizar = palabras.getPalabras();
+
+            }
+
+
+
+//            if (flagTimer == true) {
+//
+//            } else if (flagTimer == false) {
+//                timer.start();
+//                flagTimer = true;
+//            }
 
             if (e.getSource() == timer) {
-                if (counter <= 10) {
-                    palabraPrueba.setText(diccionario.get(counter));
-                } else {
-                    timer.stop();
-                    JOptionPane.showMessageDialog(null, "Ya se mostraron todas las palabras del txt");
-                    flagTimer = false;
-                }
-                counter++;
-            }
-
-            if (e.getSource() == mostrarPalabras) {
-                if (flagTimer == true) {
-
-                } else if (flagTimer == false) {
-                    timer.start();
-                    flagTimer = true;
+                if(elModelo.estado == 0){
+                    timer.setDelay(5000);
+                    if (counter < 10) {
+                        System.out.println(palabrasNivel.get(counter));
+                    } else {
+                        timer.stop();
+                        JOptionPane.showMessageDialog(null, "Ya se mostraron todas las palabras del txt");
+                        flagTimer = false;
+                    }
+                    counter++;
+                }else{
+                    timer.setDelay(7000);
                 }
             }
 
-//            if(e.getSource()==timer){
-//                counter++;
-//                if(counter<=7){
-//                    squareColor.setBackground(new Color(random.nextInt(256),
-//                            random.nextInt(256),
-//                            random.nextInt(256)));
-//                }else{
-//                    timer.stop();
-//                    //mostrarPalabras.setVisible(true);
-//                    mostrarPalabras.setEnabled(true);
-//                    mostrarPalabras.addActionListener(escucha);
-//                }
-//            }else{
-//                timer.start();
-//                counter=0;
-//                //mostrarPalabras.setVisible(false);
-//                mostrarPalabras.setEnabled(false);
-//                mostrarPalabras.removeActionListener(escucha);
-//            }
+            revalidate();
+            repaint();
         }
     }
 }

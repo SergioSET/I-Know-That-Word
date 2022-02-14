@@ -4,21 +4,23 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class FileManager {
-    public static final String PATH = "src/myProject/archivos/Palabras.txt";
+    //public static final String PATH = "src/myProject/archivos/Palabras.txt";
     private FileReader fileReader;
     private BufferedReader input;
     private FileWriter fileWriter;
     private BufferedWriter output;
 
-    public ArrayList<String> lecturaFile() {
-        ArrayList<String> frases = new ArrayList<String>();
+    public ArrayList<String> lecturaFile(String archivo) {
+        ArrayList<String> lista = new ArrayList<String>();
+
+        String PATH = "src/myProject/archivos/"+archivo;
 
         try {
             fileReader = new FileReader(PATH);
             input = new BufferedReader(fileReader);
             String line = input.readLine();
             while (line != null) {
-                frases.add(line);
+                lista.add(line);
                 line = input.readLine();
             }
         } catch (FileNotFoundException e) {
@@ -32,23 +34,23 @@ public class FileManager {
                 e.printStackTrace();
             }
         }
-        return frases;
+        return lista;
     }
 
-    public void escribirFile(String line) {
-        try {
-            fileWriter = new FileWriter(PATH, true);//True=conservar, False=Borrar
-            output = new BufferedWriter(fileWriter);
-            output.write(line);
-            output.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                output.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void escribirFile(String line) {
+//        try {
+//            fileWriter = new FileWriter(PATH, true);//True=conservar, False=Borrar
+//            output = new BufferedWriter(fileWriter);
+//            output.write(line);
+//            output.newLine();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                output.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 }
