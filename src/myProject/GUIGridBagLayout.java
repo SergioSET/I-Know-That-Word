@@ -12,11 +12,11 @@ import java.io.IOException;
 public class GUIGridBagLayout<string> extends JFrame {
 
     private Header headerProject;
-    private JLabel palabraAMostrar, usuario, mostrarNombre, mostrarNivelActual, mostrarAciertos;
-    private JPanel inicio, nombreJugador, panelMostrarPalabras, estadoActual, seleccionarPalabras;
+    private JLabel resultado, palabraAMostrar, palabraSeleccionar, usuario, mostrarNombre, mostrarNivelActual, mostrarAciertos;
+    private JPanel inicio, nombreJugador, panelMostrarPalabras, estadoActual, seleccionarPalabras, pantallaResultados;
     private JTextField nombre;
-    private JButton mostrarPalabras, jugar, ayuda, salir, botonSi, botonNo, aceptar, continuar;
-    private Timer timer;
+    private JButton mostrarPalabras, jugar, ayuda, salir, botonSi, botonNo, aceptar, continuar, reiniciarNivel, avanzar;
+    private Timer timerMostrar, timerSeleccionar;
     private Jugador elJugador;
     private ModelIKnowThatWord elModelo;
     private Escucha escucha;
@@ -25,8 +25,10 @@ public class GUIGridBagLayout<string> extends JFrame {
     private boolean flagTimer, usuarioRegistrado;
     private ImageIcon imageInicio;
     private String nombreUsuario = null;
-    private int nivelMaximoSuperado = 1;
+    private int nivelMaximoSuperado = 0;
     private int nivelActual = 1;
+    private int porcentajeAciertos = 0;
+    private String palabra;
 
     /**
      * Constructor of GUI class
@@ -41,7 +43,6 @@ public class GUIGridBagLayout<string> extends JFrame {
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 
     }
 
@@ -132,7 +133,7 @@ public class GUIGridBagLayout<string> extends JFrame {
         //PANTALLA MOSTRAR ESTADO
         {
             estadoActual = new JPanel();
-            estadoActual.setPreferredSize(new Dimension(500, 300));
+            estadoActual.setPreferredSize(new Dimension(500, 20));
             constraints.gridx = 0;
             constraints.gridy = 1;
             constraints.gridwidth = 5;
@@ -151,7 +152,7 @@ public class GUIGridBagLayout<string> extends JFrame {
         //PANTALLA MOSTRAR PALABRAS
         {
             panelMostrarPalabras = new JPanel();
-            panelMostrarPalabras.setPreferredSize(new Dimension(500, 360));
+            panelMostrarPalabras.setPreferredSize(new Dimension(500, 320));
             constraints.gridx = 0;
             constraints.gridy = 2;
             constraints.gridwidth = 5;
@@ -173,15 +174,76 @@ public class GUIGridBagLayout<string> extends JFrame {
             this.add(panelMostrarPalabras, constraints);
         }
 
+        //PANTALLA SELECCIONAR PALABRAS
+        {
+            seleccionarPalabras = new JPanel();
+            seleccionarPalabras.setPreferredSize(new Dimension(500, 320));
+            constraints.gridx = 0;
+            constraints.gridy = 2;
+            constraints.gridwidth = 5;
+
+            palabraSeleccionar = new JLabel("\"¡Buena suerte!\"");
+
+            botonSi = new JButton("Sí");
+            botonSi.addActionListener(escucha);
+
+            botonNo = new JButton("No");
+            botonNo.addActionListener(escucha);
+
+            seleccionarPalabras.add(palabraSeleccionar);
+            seleccionarPalabras.add(botonSi);
+            seleccionarPalabras.add(botonNo);
+
+            this.add(seleccionarPalabras, constraints);
+        }
+
+        //PANTALLA RESULTADOS
+        {
+            pantallaResultados = new JPanel();
+            pantallaResultados.setPreferredSize(new Dimension(500, 320));
+            constraints.gridx = 0;
+            constraints.gridy = 2;
+            constraints.gridwidth = 5;
+
+            resultado = new JLabel("Aquí se mostrará tu resultado");
+
+            reiniciarNivel = new JButton("Reiniciar nivel");
+            reiniciarNivel.addActionListener(escucha);
+            reiniciarNivel.setVisible(false);
+
+            avanzar = new JButton("Siguiente nivel");
+            avanzar.addActionListener(escucha);
+            avanzar.setVisible(false);
+
+            pantallaResultados.add(resultado);
+            pantallaResultados.add(avanzar);
+            pantallaResultados.add(reiniciarNivel);
+
+            this.add(pantallaResultados, constraints);
+        }
+
         inicio.setVisible(true);
         nombreJugador.setVisible(false);
         estadoActual.setVisible(false);
         panelMostrarPalabras.setVisible(false);
+        seleccionarPalabras.setVisible(false);
+        pantallaResultados.setVisible(false);
 
+        timerMostrar = new Timer(5000, escucha);
+        timerSeleccionar = new Timer(7000, escucha);
 
-        timer = new Timer(1000, escucha);
-        flagTimer = false;
+    }
 
+    public void resultados() {
+        if (elModelo.superoNivel()) {
+            resultado.setText("Has pasado este nivel, podrás avanzar al siguiente nivel.");
+            avanzar.setVisible(true);
+            nivelMaximoSuperado = nivelActual;
+            nivelActual = nivelActual + 1;
+        } else {
+            resultado.setText("Has fallado este nivel, no podrás avanzar al siguiente nivel.");
+            reiniciarNivel.setVisible(true);
+        }
     }
 
     /**
@@ -200,11 +262,9 @@ public class GUIGridBagLayout<string> extends JFrame {
      * inner class that extends an Adapter Class or implements Listeners used by GUI class
      */
     private class Escucha implements ActionListener {
-        private Random random;
         private int counter;
 
         public Escucha() {
-            random = new Random();
             counter = 0;
         }
 
@@ -238,8 +298,10 @@ public class GUIGridBagLayout<string> extends JFrame {
 
                     if (elJugador.estaRegistrado(nombreUsuario)) {
                         nivelMaximoSuperado = elJugador.getNivel();
+                        nivelActual = nivelMaximoSuperado + 1;
                         JOptionPane.showMessageDialog(null, "Usted ya se encuentra registrado, su nivel máximo superado es: " + nivelMaximoSuperado);
-                    }else{
+                    } else {
+                        nivelActual = 1;
                         nivelMaximoSuperado = 0;
                     }
 
@@ -255,34 +317,90 @@ public class GUIGridBagLayout<string> extends JFrame {
                 }
             }
 
-            if(e.getSource() == mostrarPalabras){
+            if (e.getSource() == mostrarPalabras) {
                 mostrarPalabras.setEnabled(false);
-                palabrasMemorizar = palabras.getPalabras();
-
+                elModelo.determinarPalabrasNivel(nivelActual);
+                palabrasNivel = elModelo.getArrayPalabrasNivel();
+                palabrasMemorizar = elModelo.getArrayPalabrasMemorizar();
+                System.out.println(palabrasNivel + "" + palabrasNivel.toArray().length);
+                System.out.println(palabrasMemorizar + "" + palabrasMemorizar.toArray().length);
+                counter = 0;
+                timerMostrar.start();
             }
 
+            if (e.getSource() == continuar) {
+                panelMostrarPalabras.setVisible(false);
+                seleccionarPalabras.setVisible(true);
+                counter = 0;
+                timerSeleccionar.start();
+            }
 
+            if (e.getSource() == botonSi) {
+                botonSi.setEnabled(false);
+                botonNo.setEnabled(false);
+                if (elModelo.palabraEstaEnNivel(palabra) == true) {
+                    elModelo.aciertos = elModelo.aciertos + 1;
+                }
+                mostrarAciertos.setText("Aciertos: " + elModelo.aciertos);
+            }
 
-//            if (flagTimer == true) {
-//
-//            } else if (flagTimer == false) {
-//                timer.start();
-//                flagTimer = true;
-//            }
+            if (e.getSource() == botonNo) {
+                botonNo.setEnabled(false);
+                botonSi.setEnabled(false);
+                if (elModelo.palabraEstaEnNivel(palabra) == false) {
+                    elModelo.aciertos = elModelo.aciertos + 1;
+                }
+                mostrarAciertos.setText("Aciertos: " + elModelo.aciertos);
+            }
 
-            if (e.getSource() == timer) {
-                if(elModelo.estado == 0){
-                    timer.setDelay(5000);
-                    if (counter < 10) {
-                        System.out.println(palabrasNivel.get(counter));
-                    } else {
-                        timer.stop();
-                        JOptionPane.showMessageDialog(null, "Ya se mostraron todas las palabras del txt");
-                        flagTimer = false;
-                    }
+            if (e.getSource() == avanzar) {
+                pantallaResultados.setVisible(false);
+                panelMostrarPalabras.setVisible(true);
+                palabraAMostrar.setText("Aquí se mostrarán las palabras");
+                mostrarPalabras.setEnabled(true);
+                continuar.setEnabled(false);
+                elModelo.aciertos = 0;
+                mostrarAciertos.setText("Aciertos: " + elModelo.aciertos);
+                mostrarNivelActual.setText("Nivel actual: " + nivelActual);
+                elModelo.arrayPalabrasNivel.clear();
+                elModelo.arrayPalabrasMemorizar.clear();
+                System.out.println(nivelActual);
+            }
+
+            if (e.getSource() == timerMostrar) {
+
+                if (counter < elModelo.palabrasMemorizar) {
+                    palabraAMostrar.setText(palabrasMemorizar.get(counter));
                     counter++;
-                }else{
-                    timer.setDelay(7000);
+                } else {
+                    timerMostrar.stop();
+                    palabraAMostrar.setText("¡Buena suerte!");
+                    continuar.setEnabled(true);
+                    flagTimer = false;
+                    counter = 0;
+                    elModelo.estado = 1;
+                }
+            }
+
+            if (e.getSource() == timerSeleccionar) {
+                botonSi.setEnabled(true);
+                botonNo.setEnabled(true);
+                if (counter < elModelo.palabrasNivel) {
+                    palabraSeleccionar.setText(palabrasNivel.get(counter));
+                    palabra = palabrasNivel.get(counter);
+                    System.out.println(elModelo.palabraEstaEnNivel(palabra));
+                    counter++;
+                } else {
+                    timerSeleccionar.stop();
+                    avanzar.setVisible(false);
+                    reiniciarNivel.setVisible(false);
+                    porcentajeAciertos = elModelo.porcentaje();
+                    flagTimer = false;
+                    elModelo.estado = 0;
+                    counter = 0;
+                    seleccionarPalabras.setVisible(false);
+                    pantallaResultados.setVisible(true);
+                    resultados();
                 }
             }
 
