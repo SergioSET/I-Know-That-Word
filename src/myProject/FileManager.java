@@ -36,21 +36,4 @@ public class FileManager {
         }
         return lista;
     }
-
-//    public void escribirFile(String line) {
-//        try {
-//            fileWriter = new FileWriter(PATH, true);//True=conservar, False=Borrar
-//            output = new BufferedWriter(fileWriter);
-//            output.write(line);
-//            output.newLine();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                output.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 }

@@ -1,6 +1,7 @@
 package myProject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ModelIKnowThatWord {
     public Palabras palabra;
@@ -28,8 +29,8 @@ public class ModelIKnowThatWord {
                 aciertosNecesarios = 70;
                 break;
             case 2:
-                palabrasNivel = 40;
-                palabrasMemorizar = 20;
+                palabrasNivel = 14;
+                palabrasMemorizar = 7;
                 aciertosNecesarios = 70;
                 break;
             case 3:
@@ -113,7 +114,7 @@ public class ModelIKnowThatWord {
         }
     }
 
-    public int porcentaje() {
+    public int calcularPorcentaje() {
 
         porcentaje = (aciertos * 100) / palabrasNivel;
 
@@ -127,24 +128,4 @@ public class ModelIKnowThatWord {
             return false;
         }
     }
-
-/**
- public int aciertosTotales() {
- int aciertos = 0;
- if (palabraAcierto = true)
- {
- return aciertos + 1;
- }
- return aciertos;
- }
-
-
-
- public int total()
- {
- switch(elegirNivel.getNumber
- }
-
-
- */
 }

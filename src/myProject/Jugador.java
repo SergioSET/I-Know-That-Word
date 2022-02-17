@@ -1,17 +1,16 @@
 package myProject;
 
+import javax.sound.midi.SysexMessage;
 import javax.swing.*;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 
 public class Jugador {
 
+    private FileWriter fileWriter;
+    private BufferedWriter output;
     private String usuario;
-    private int nivel;
+    public int nivel, puesto;
     public ArrayList<String> listaUsuarios = new ArrayList<String>();
     public ArrayList<String> listaNiveles = new ArrayList<String>();
 
@@ -19,29 +18,23 @@ public class Jugador {
         FileManager fileManager = new FileManager();
         listaUsuarios = fileManager.lecturaFile("Usuarios.txt");
         listaNiveles = fileManager.lecturaFile("Niveles.txt");
+        puesto = 0;
         usuario = "";
         nivel = 1;
     }
 
     public boolean estaRegistrado(String nombre) {
-
-        for (int i = 0; i <= listaUsuarios.toArray().length; i++) {
-            if(listaUsuarios.get(i) == nombre){
-                usuario = nombre;
-                return true;
-            }else{
-                return false;
-            }
+        if (listaUsuarios.contains(nombre)) {
+            puesto = listaUsuarios.indexOf(nombre);
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     public int getNivel() {
-        for (int i = 0; i <= listaNiveles.toArray().length; i++) {
-            if(listaUsuarios.get(i) == usuario){
-                nivel = Integer.parseInt(listaNiveles.get(i));
-            }
-        }
+        nivel = Integer.parseInt(listaNiveles.get(puesto));
+        System.out.println(nivel);
         return nivel;
     }
 
@@ -49,51 +42,82 @@ public class Jugador {
         return usuario;
     }
 
-    public void registrarJugador(String nombre, int nivelSuperado) {
-
-        if (estaRegistrado(nombre) == false) {
-
-            String user = nombre;
-            int level = nivelSuperado;
-
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter("Usuarios.txt", true);
-                fw.write(user);
-                fw.close();
-                fw = new FileWriter("Niveles.txt", true);
-                fw.write(level);
-                fw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        } else if (estaRegistrado(nombre) == true) {
-            JOptionPane.showInputDialog(null, "Este jugador ya está registrado");
+    public boolean nombreVacio(String nombre) {
+        if (nombre == null || nombre == "" || nombre.length() < 3) {
+            return true;
+        } else {
+            return false;
         }
     }
 
-    public void actualizarNivel(String nombre, int nivelSuperado) {
+    public void registrarJugador(String nombre, int nivelSuperado) {
+        String user = nombre;
+        int level = nivelSuperado;
 
-        if (estaRegistrado(nombre) == false) {
-
-            String user = nombre;
-            int level = nivelSuperado;
-
-            FileWriter fw = null;
+        try {
+            fileWriter = new FileWriter("src/myProject/archivos/Usuarios.txt", true);//True=conservar, False=Borrar
+            output = new BufferedWriter(fileWriter);
+            output.newLine();
+            output.write(nombre);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
             try {
-                fw = new FileWriter("Usuarios.txt", true);
-                fw.write(user);
-                fw.close();
-                fw = new FileWriter("Niveles.txt", true);
-                fw.write(level);
-                fw.close();
+                output.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
 
-        } else if (estaRegistrado(nombre) == true) {
-            JOptionPane.showInputDialog(null, "Este jugador ya está registrado");
+        try {
+            fileWriter = new FileWriter("src/myProject/archivos/Niveles.txt", true);//True=conservar, False=Borrar
+            output = new BufferedWriter(fileWriter);
+            output.newLine();
+            output.write(String.valueOf(nivelSuperado));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void actualizarUsuario(String nombre, int nivelSuperado) {
+
+        int indexAGuardar = 0;
+        String valorActualizar;
+
+        indexAGuardar = listaUsuarios.indexOf(nombre);
+
+        System.out.println(indexAGuardar);
+
+        valorActualizar = String.valueOf(listaNiveles.get(indexAGuardar));
+
+        listaNiveles.set(indexAGuardar, valorActualizar);
+
+        System.out.println(listaNiveles);
+
+        try {
+            fileWriter = new FileWriter("src/myProject/archivos/Niveles.txt", false);//True=conservar, False=Borrar
+            output = new BufferedWriter(fileWriter);
+            for (int i = 0; i < listaNiveles.toArray().length; i++) {
+                output.write(String.valueOf(listaNiveles.get(i)));
+                if ((i + 1) < listaNiveles.toArray().length) {
+                    output.newLine();
+                }
+                System.out.println(listaNiveles.get(i));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

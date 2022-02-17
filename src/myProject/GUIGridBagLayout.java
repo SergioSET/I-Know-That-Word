@@ -5,15 +5,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Random;
-import java.io.FileWriter;
-import java.io.IOException;
 
-public class GUIGridBagLayout<string> extends JFrame {
+public class GUIGridBagLayout extends JFrame {
 
     private Header headerProject;
-    private JLabel resultado, palabraAMostrar, palabraSeleccionar, usuario, mostrarNombre, mostrarNivelActual, mostrarAciertos;
-    private JPanel inicio, nombreJugador, panelMostrarPalabras, estadoActual, seleccionarPalabras, pantallaResultados;
+    private JLabel estadisticas, resultado, palabraAMostrar, palabraSeleccionar, usuario, mostrarNombre, mostrarNivelActual, mostrarAciertos;
+    private JPanel superior, inicio, nombreJugador, panelMostrarPalabras, estadoActual, seleccionarPalabras, pantallaResultados;
     private JTextField nombre;
     private JButton mostrarPalabras, jugar, ayuda, salir, botonSi, botonNo, aceptar, continuar, reiniciarNivel, avanzar;
     private Timer timerMostrar, timerSeleccionar;
@@ -22,7 +19,6 @@ public class GUIGridBagLayout<string> extends JFrame {
     private Escucha escucha;
     private Palabras palabras;
     private ArrayList<String> palabrasNivel, palabrasMemorizar;
-    private boolean flagTimer, usuarioRegistrado;
     private ImageIcon imageInicio;
     private String nombreUsuario = null;
     private int nivelMaximoSuperado = 0;
@@ -43,7 +39,7 @@ public class GUIGridBagLayout<string> extends JFrame {
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        this.setBackground(Color.CYAN);
     }
 
     /**
@@ -62,39 +58,44 @@ public class GUIGridBagLayout<string> extends JFrame {
         elModelo = new ModelIKnowThatWord();
         //Set up JComponents
 
-        headerProject = new Header("I KNOW THAT WORD!!", Color.BLACK);
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 3;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        //constraints.anchor = GridBagConstraints.NORTHWEST;
-        this.add(headerProject, constraints);
+        //SUPERIOR
+        {
+            superior = new JPanel();
+            superior.setBackground(Color.CYAN);
+            superior.setPreferredSize(new Dimension(500, 40));
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.gridwidth = 3;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.LINE_START;
 
-        ayuda = new JButton("?");
-        ayuda.addActionListener(escucha);
-        constraints.gridx = 3;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        //constraints.fill = GridBagConstraints.HORIZONTAL;
-        //constraints.anchor = GridBagConstraints.NORTHEAST ;
-        this.add(ayuda, constraints);
+            ayuda = new JButton("?");
+            ayuda.setPreferredSize(new Dimension(65, 30));
 
-        salir = new JButton("Salir");
-        salir.addActionListener(escucha);
-        constraints.gridx = 4;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        //constraints.fill = GridBagConstraints.HORIZONTAL;
-        //constraints.anchor = GridBagConstraints.NORTHEAST ;
-        this.add(salir, constraints);
+            ayuda.addActionListener(escucha);
+            superior.add(ayuda);
+
+            headerProject = new Header("I KNOW THAT WORD!!", Color.BLACK);
+            headerProject.setPreferredSize(new Dimension(350, 30));
+            superior.add(headerProject);
+
+            salir = new JButton("Salir");
+            salir.setPreferredSize(new Dimension(65, 30));
+            salir.addActionListener(escucha);
+            superior.add(salir);
+
+            this.add(superior, constraints);
+        }
 
         //PANTALLA INICIO
         {
             inicio = new JPanel();
+            inicio.setBackground(Color.CYAN);
             inicio.setPreferredSize(new Dimension(500, 360));
             constraints.gridx = 0;
             constraints.gridy = 1;
-            constraints.gridwidth = 5;
+            constraints.gridwidth = 3;
+            constraints.fill = GridBagConstraints.BOTH;
             constraints.anchor = GridBagConstraints.LINE_START;
             imageInicio = new ImageIcon(this.getClass().getResource("/myProject/archivos/imagenInicio.png"));
             JLabel picLabel = new JLabel(imageInicio);
@@ -110,10 +111,11 @@ public class GUIGridBagLayout<string> extends JFrame {
         //PANTALLA NOMBRE USUARIO
         {
             nombreJugador = new JPanel();
+            nombreJugador.setBackground(Color.CYAN);
             nombreJugador.setPreferredSize(new Dimension(500, 360));
             constraints.gridx = 0;
-            constraints.gridy = 1;
-            constraints.gridwidth = 5;
+            constraints.gridy = 2;
+            constraints.gridwidth = 3;
 
             usuario = new JLabel("Ingresa tu nombre");
 
@@ -129,22 +131,29 @@ public class GUIGridBagLayout<string> extends JFrame {
             this.add(nombreJugador, constraints);
         }
 
-
         //PANTALLA MOSTRAR ESTADO
         {
             estadoActual = new JPanel();
-            estadoActual.setPreferredSize(new Dimension(500, 20));
+            estadoActual.setBackground(Color.CYAN);
+            estadoActual.setPreferredSize(new Dimension(500, 30));
             constraints.gridx = 0;
             constraints.gridy = 1;
-            constraints.gridwidth = 5;
+            constraints.gridwidth = 3;
 
             mostrarNombre = new JLabel("Usuario: " + nombreUsuario);
-            mostrarNivelActual = new JLabel("Nivel actual: " + nivelActual);
-            mostrarAciertos = new JLabel("Aciertos: " + elModelo.aciertos);
+            mostrarNombre.setSize(new Dimension(100, 30));
 
+            mostrarNivelActual = new JLabel("Nivel actual: " + nivelActual);
+            mostrarNivelActual.setSize(new Dimension(100, 30));
+
+            mostrarAciertos = new JLabel("Aciertos: " + elModelo.aciertos);
+            mostrarAciertos.setSize(new Dimension(100, 30));
+
+            //estadoActual.add(ayuda);
             estadoActual.add(mostrarNombre);
             estadoActual.add(mostrarNivelActual);
             estadoActual.add(mostrarAciertos);
+            //estadoActual.add(salir);
 
             this.add(estadoActual, constraints);
         }
@@ -152,10 +161,11 @@ public class GUIGridBagLayout<string> extends JFrame {
         //PANTALLA MOSTRAR PALABRAS
         {
             panelMostrarPalabras = new JPanel();
-            panelMostrarPalabras.setPreferredSize(new Dimension(500, 320));
+            panelMostrarPalabras.setBackground(Color.CYAN);
+            panelMostrarPalabras.setPreferredSize(new Dimension(500, 330));
             constraints.gridx = 0;
             constraints.gridy = 2;
-            constraints.gridwidth = 5;
+            constraints.gridwidth = 3;
 
             palabraAMostrar = new JLabel("Aquí se mostrarán las palabras");
 
@@ -177,17 +187,20 @@ public class GUIGridBagLayout<string> extends JFrame {
         //PANTALLA SELECCIONAR PALABRAS
         {
             seleccionarPalabras = new JPanel();
-            seleccionarPalabras.setPreferredSize(new Dimension(500, 320));
+            seleccionarPalabras.setBackground(Color.CYAN);
+            seleccionarPalabras.setPreferredSize(new Dimension(500, 330));
             constraints.gridx = 0;
             constraints.gridy = 2;
-            constraints.gridwidth = 5;
+            constraints.gridwidth = 3;
 
-            palabraSeleccionar = new JLabel("\"¡Buena suerte!\"");
+            palabraSeleccionar = new JLabel("¡Buena suerte!");
 
             botonSi = new JButton("Sí");
+            botonSi.setEnabled(false);
             botonSi.addActionListener(escucha);
 
             botonNo = new JButton("No");
+            botonNo.setEnabled(false);
             botonNo.addActionListener(escucha);
 
             seleccionarPalabras.add(palabraSeleccionar);
@@ -200,10 +213,13 @@ public class GUIGridBagLayout<string> extends JFrame {
         //PANTALLA RESULTADOS
         {
             pantallaResultados = new JPanel();
-            pantallaResultados.setPreferredSize(new Dimension(500, 320));
+            pantallaResultados.setBackground(Color.CYAN);
+            pantallaResultados.setPreferredSize(new Dimension(500, 330));
             constraints.gridx = 0;
             constraints.gridy = 2;
-            constraints.gridwidth = 5;
+            constraints.gridwidth = 3;
+
+            estadisticas = new JLabel("Aquí se mostrarán tus estadisticas");
 
             resultado = new JLabel("Aquí se mostrará tu resultado");
 
@@ -215,6 +231,7 @@ public class GUIGridBagLayout<string> extends JFrame {
             avanzar.addActionListener(escucha);
             avanzar.setVisible(false);
 
+            pantallaResultados.add(estadisticas);
             pantallaResultados.add(resultado);
             pantallaResultados.add(avanzar);
             pantallaResultados.add(reiniciarNivel);
@@ -222,21 +239,22 @@ public class GUIGridBagLayout<string> extends JFrame {
             this.add(pantallaResultados, constraints);
         }
 
+        superior.setVisible(true);
         inicio.setVisible(true);
-        nombreJugador.setVisible(false);
         estadoActual.setVisible(false);
+        nombreJugador.setVisible(false);
         panelMostrarPalabras.setVisible(false);
         seleccionarPalabras.setVisible(false);
         pantallaResultados.setVisible(false);
 
         timerMostrar = new Timer(5000, escucha);
         timerSeleccionar = new Timer(7000, escucha);
-
     }
 
     public void resultados() {
         if (elModelo.superoNivel()) {
             resultado.setText("Has pasado este nivel, podrás avanzar al siguiente nivel.");
+            estadisticas.setText("Porcentaje aciertos: " + elModelo.porcentaje + "%");
             avanzar.setVisible(true);
             nivelMaximoSuperado = nivelActual;
             nivelActual = nivelActual + 1;
@@ -276,12 +294,17 @@ public class GUIGridBagLayout<string> extends JFrame {
             }
 
             if (e.getSource() == salir) {
-//                if (usuarioRegistrado) {
-//                    elJugador.actualizarNivel(nombreUsuario, nivelMaximoSuperado);
-//                } else {
-//                    elJugador.registrarJugador(nombreUsuario, nivelMaximoSuperado);
-//                }
-                System.exit(0);
+                if (elJugador.nombreVacio(nombreUsuario) == true) {
+                    System.exit(0);
+                } else {
+                    System.out.println(nombreUsuario + nivelMaximoSuperado);
+                    if (elJugador.estaRegistrado(nombreUsuario) == true) {
+                        elJugador.actualizarUsuario(nombreUsuario, nivelMaximoSuperado);
+                    } else {
+                        elJugador.registrarJugador(nombreUsuario, nivelMaximoSuperado);
+                    }
+                    System.exit(0);
+                }
             }
 
             if (e.getSource() == jugar) {
@@ -291,14 +314,18 @@ public class GUIGridBagLayout<string> extends JFrame {
 
             if (e.getSource() == aceptar) {
 
-                nombreUsuario = nombre.getText();
+                nombreUsuario = nombre.getText().replaceAll("\\s+", "");
 
-                if (nombreUsuario != "" || nombreUsuario != null) {
+                if (elJugador.nombreVacio(nombreUsuario) == false) {
                     JOptionPane.showMessageDialog(null, "Su nombre de usuario es: " + nombreUsuario);
 
-                    if (elJugador.estaRegistrado(nombreUsuario)) {
+                    if (elJugador.estaRegistrado(nombreUsuario) == true) {
                         nivelMaximoSuperado = elJugador.getNivel();
-                        nivelActual = nivelMaximoSuperado + 1;
+                        if (nivelMaximoSuperado == 10) {
+                            nivelActual = 10;
+                        } else {
+                            nivelActual = nivelMaximoSuperado + 1;
+                        }
                         JOptionPane.showMessageDialog(null, "Usted ya se encuentra registrado, su nivel máximo superado es: " + nivelMaximoSuperado);
                     } else {
                         nivelActual = 1;
@@ -313,7 +340,7 @@ public class GUIGridBagLayout<string> extends JFrame {
                     estadoActual.setVisible(true);
                     panelMostrarPalabras.setVisible(true);
                 } else {
-                    JOptionPane.showMessageDialog(null, "El nombre está vacío");
+                    JOptionPane.showMessageDialog(null, "El nombre es muy corto o está vacío");
                 }
             }
 
@@ -364,7 +391,19 @@ public class GUIGridBagLayout<string> extends JFrame {
                 mostrarNivelActual.setText("Nivel actual: " + nivelActual);
                 elModelo.arrayPalabrasNivel.clear();
                 elModelo.arrayPalabrasMemorizar.clear();
-                System.out.println(nivelActual);
+            }
+
+            if (e.getSource() == reiniciarNivel) {
+                pantallaResultados.setVisible(false);
+                panelMostrarPalabras.setVisible(true);
+                palabraAMostrar.setText("Aquí se mostrarán las palabras");
+                mostrarPalabras.setEnabled(true);
+                continuar.setEnabled(false);
+                elModelo.aciertos = 0;
+                mostrarAciertos.setText("Aciertos: " + elModelo.aciertos);
+                mostrarNivelActual.setText("Nivel actual: " + nivelActual);
+                elModelo.arrayPalabrasNivel.clear();
+                elModelo.arrayPalabrasMemorizar.clear();
             }
 
             if (e.getSource() == timerMostrar) {
@@ -376,7 +415,6 @@ public class GUIGridBagLayout<string> extends JFrame {
                     timerMostrar.stop();
                     palabraAMostrar.setText("¡Buena suerte!");
                     continuar.setEnabled(true);
-                    flagTimer = false;
                     counter = 0;
                     elModelo.estado = 1;
                 }
@@ -394,8 +432,7 @@ public class GUIGridBagLayout<string> extends JFrame {
                     timerSeleccionar.stop();
                     avanzar.setVisible(false);
                     reiniciarNivel.setVisible(false);
-                    porcentajeAciertos = elModelo.porcentaje();
-                    flagTimer = false;
+                    porcentajeAciertos = elModelo.calcularPorcentaje();
                     elModelo.estado = 0;
                     counter = 0;
                     seleccionarPalabras.setVisible(false);
