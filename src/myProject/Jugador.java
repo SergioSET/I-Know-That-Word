@@ -34,7 +34,6 @@ public class Jugador {
 
     public int getNivel() {
         nivel = Integer.parseInt(listaNiveles.get(puesto));
-        System.out.println(nivel);
         return nivel;
     }
 
@@ -92,13 +91,9 @@ public class Jugador {
 
         indexAGuardar = listaUsuarios.indexOf(nombre);
 
-        System.out.println(indexAGuardar);
-
-        valorActualizar = String.valueOf(listaNiveles.get(indexAGuardar));
+        valorActualizar = String.valueOf(nivelSuperado);
 
         listaNiveles.set(indexAGuardar, valorActualizar);
-
-        System.out.println(listaNiveles);
 
         try {
             fileWriter = new FileWriter("src/myProject/archivos/Niveles.txt", false);//True=conservar, False=Borrar
@@ -108,7 +103,6 @@ public class Jugador {
                 if ((i + 1) < listaNiveles.toArray().length) {
                     output.newLine();
                 }
-                System.out.println(listaNiveles.get(i));
             }
         } catch (IOException e) {
             e.printStackTrace();
