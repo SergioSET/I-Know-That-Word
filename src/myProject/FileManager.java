@@ -10,6 +10,9 @@ public class FileManager {
     private FileWriter fileWriter;
     private BufferedWriter output;
 
+    /**
+     * Obtiene las palabras de los archivos de texto
+     * */
     public ArrayList<String> lecturaFile(String archivo) {
         ArrayList<String> lista = new ArrayList<String>();
 

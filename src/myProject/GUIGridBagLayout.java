@@ -62,7 +62,7 @@ public class GUIGridBagLayout extends JFrame {
         elModelo = new ModelIKnowThatWord();
         //Set up JComponents
 
-        //SUPERIOR
+        //PANEL SUPERIOR
         {
             superior = new JPanel();
             superior.setBackground(Color.CYAN);
@@ -91,7 +91,7 @@ public class GUIGridBagLayout extends JFrame {
             this.add(superior, constraints);
         }
 
-        //PANTALLA INICIO
+        //PANEL INICIO
         {
             inicio = new JPanel();
             inicio.setBackground(Color.CYAN);
@@ -112,7 +112,7 @@ public class GUIGridBagLayout extends JFrame {
             this.add(inicio, constraints);
         }
 
-        //PANTALLA NOMBRE USUARIO
+        //PANEL NOMBRE USUARIO
         {
             nombreJugadorSu = new JPanel();
             nombreJugadorSu.setBackground(Color.CYAN);
@@ -158,7 +158,7 @@ public class GUIGridBagLayout extends JFrame {
 
         }
 
-        //PANTALLA MOSTRAR ESTADO
+        //PANEL MOSTRAR ESTADO
         {
             estadoActual = new JPanel();
             estadoActual.setBackground(Color.CYAN);
@@ -188,7 +188,7 @@ public class GUIGridBagLayout extends JFrame {
             this.add(estadoActual, constraints);
         }
 
-        //PANTALLA MOSTRAR PALABRAS
+        //PANEL MOSTRAR PALABRAS
         {
             panelMostrarPalabrasSu = new JPanel();
             panelMostrarPalabrasSu.setBackground(Color.CYAN);
@@ -242,7 +242,7 @@ public class GUIGridBagLayout extends JFrame {
 
         }
 
-        //PANTALLA SELECCIONAR PALABRAS
+        //PANEL SELECCIONAR PALABRAS
         {
             seleccionarPalabrasSu = new JPanel();
             seleccionarPalabrasSu.setBackground(Color.CYAN);
@@ -291,7 +291,7 @@ public class GUIGridBagLayout extends JFrame {
 
         }
 
-        //PANTALLA RESULTADOS
+        //PANEL RESULTADOS
         {
             pantallaResultadosSu = new JPanel();
             pantallaResultadosSu.setBackground(Color.CYAN);
@@ -369,9 +369,13 @@ public class GUIGridBagLayout extends JFrame {
         pantallaResultadosCe.setVisible(false);
         pantallaResultadosIn.setVisible(false);
 
-        timerMostrar = new Timer(1000, escucha);
-        timerSeleccionar = new Timer(1000, escucha);
+        timerMostrar = new Timer(5000, escucha);
+        timerSeleccionar = new Timer(7000, escucha);
     }
+
+    /**
+     * Dependiendo del porcentaje de aciertos, lanza el mensaje de resultados
+     */
 
     public void resultados() {
         if (elModelo.superoNivel()) {
@@ -444,13 +448,19 @@ public class GUIGridBagLayout extends JFrame {
 
             if (e.getSource() == aceptar) {
 
+                System.out.println(nivelActual);
+
                 nombreUsuario = nombre.getText().replaceAll("\\s+", "");
 
                 if (elJugador.nombreVacio(nombreUsuario) == false) {
-                    JOptionPane.showMessageDialog(null, "Su nombre de usuario es: " + nombreUsuario);
-
                     if (elJugador.estaRegistrado(nombreUsuario) == true) {
                         nivelMaximoSuperado = elJugador.getNivel();
+
+                        if (nivelMaximoSuperado < 0 || nivelMaximoSuperado > 10) {
+                            JOptionPane.showMessageDialog(null, "Error de sistema.");
+                            System.exit(0);
+                        }
+
                         if (nivelMaximoSuperado == 10) {
                             nivelActual = 10;
                         } else {

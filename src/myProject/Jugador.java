@@ -5,6 +5,10 @@ import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Esta clase se encarga de las acciones relacionadas con el jugador
+ */
+
 public class Jugador {
 
     private FileWriter fileWriter;
@@ -23,6 +27,9 @@ public class Jugador {
         nivel = 1;
     }
 
+    /**
+     * Verifica si el nombre del usuario digitado ya se encuentra registrado
+     */
     public boolean estaRegistrado(String nombre) {
         if (listaUsuarios.contains(nombre)) {
             puesto = listaUsuarios.indexOf(nombre);
@@ -32,15 +39,24 @@ public class Jugador {
         }
     }
 
+    /**
+     * Retorna el nivel según el usuario
+     */
     public int getNivel() {
         nivel = Integer.parseInt(listaNiveles.get(puesto));
         return nivel;
     }
 
+    /**
+     * Retorna el nombre de usuario
+     */
     public String getNombre() {
         return usuario;
     }
 
+    /**
+     * Verifica si el nombre digitado se encuentra vacío o no es lo suficientemente largo
+     */
     public boolean nombreVacio(String nombre) {
         if (nombre == null || nombre == "" || nombre.length() < 3) {
             return true;
@@ -49,6 +65,9 @@ public class Jugador {
         }
     }
 
+    /**
+     * Registra el jugador en Usuario.txt, y su nivel maxino en Niveles.txt
+     */
     public void registrarJugador(String nombre, int nivelSuperado) {
         String user = nombre;
         int level = nivelSuperado;
@@ -84,6 +103,9 @@ public class Jugador {
         }
     }
 
+    /**
+     * Actualiza el nivel maxino en Niveles.txt del usuario
+     */
     public void actualizarUsuario(String nombre, int nivelSuperado) {
 
         int indexAGuardar = 0;
